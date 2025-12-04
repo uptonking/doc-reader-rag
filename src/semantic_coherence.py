@@ -89,6 +89,7 @@ class SemanticCoherenceValidator:
         self.embeddings = OllamaEmbeddings(
             model=settings.embedding_model,
             base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+            num_ctx=512,
             # api_key="local"
         )
 

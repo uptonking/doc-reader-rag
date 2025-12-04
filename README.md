@@ -190,3 +190,29 @@ MIT License - see [LICENSE](LICENSE) for details.
 **Port conflicts**: Use `python main.py start --port 8001` to use a different port
 
 **Poor answer quality**: Increase `TOP_K_RESULTS` and `CHUNK_OVERLAP` for better context retrieval
+
+- http://localhost:8000/api/index-stats/?index_name=default failed with Status Code 404 Not Found. "error": "Index "default" not found"
+
+```shell
+rm -f db.sqlite  # rm if db exists
+uv run --env-file .env -- python -m django migrate
+
+uv run --env-file .env -- python -c "
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_app.settings')
+django.setup()
+
+from rag_app.models import DocumentIndex
+
+# Create default index
+default_index = DocumentIndex.objects.create(
+    name='default', 
+    description='Default document index for RAG application'
+)
+print(f'✅ Created default index: {default_index}')
+"
+
+curl -s "http://localhost:8000/api/index-stats/?index_name=default"
+
+```

@@ -194,6 +194,10 @@ class ChromaVectorStore(VectorStoreManager):
             )
             self.vector_store: Optional[Chroma] = None
             self.collection_name = "document_collection"
+            # 设置持久化目录，确保 ChromaDB 能够正确创建和维护数据库
+            self.persist_directory = os.path.join(os.getcwd(), "chroma_db")
+            # 确保目录存在
+            os.makedirs(self.persist_directory, exist_ok=True)
 
         except ImportError as exc:
             raise ImportError(
@@ -209,7 +213,8 @@ class ChromaVectorStore(VectorStoreManager):
             self.vector_store = Chroma.from_documents(
                 documents,
                 self.embeddings,
-                collection_name=self.collection_name
+                collection_name=self.collection_name,
+                persist_directory=self.persist_directory
             )
         else:
             self.vector_store.add_documents(documents)
@@ -237,11 +242,18 @@ class ChromaVectorStore(VectorStoreManager):
         '''Load Chroma collection.'''
         from langchain_community.vectorstores import Chroma
 
-        self.vector_store = Chroma(
-            collection_name=self.collection_name,
-            embedding_function=self.embeddings
-        )
-        logger.info("Chroma vector store loaded")
+        # 尝试从持久化目录加载现有的 Chroma 集合
+        try:
+            self.vector_store = Chroma(
+                collection_name=self.collection_name,
+                embedding_function=self.embeddings,
+                persist_directory=self.persist_directory
+            )
+            logger.info("Chroma vector store loaded from existing data")
+        except Exception as e:
+            logger.warning(f"Could not load existing Chroma collection: {e}")
+            # 如果加载失败，创建一个新的空集合
+            self.vector_store = None
 
 
 class VectorStoreFactory:
@@ -290,6 +302,17 @@ class DocumentIndex:
                 self.load_index()
             except Exception as e:
                 logger.warning(f"Could not load existing index: {e}")
+        
+        # 对于 ChromaVectorStore，尝试直接从持久化目录加载
+        if isinstance(self.vector_store, ChromaVectorStore):
+            try:
+                # 检查 chroma_db 目录是否存在且有数据
+                chroma_db_path = os.path.join(os.getcwd(), "chroma_db")
+                if os.path.exists(chroma_db_path) and os.listdir(chroma_db_path):
+                    self.vector_store.load("")  # 传入空字符串，因为路径已在 ChromaVectorStore 中设置
+                    logger.info("Loaded existing ChromaDB data")
+            except Exception as e:
+                logger.warning(f"Could not load existing ChromaDB data: {e}")
 
     def add_documents(self, documents: List[Document]) -> None:
         '''Add documents to the index.'''

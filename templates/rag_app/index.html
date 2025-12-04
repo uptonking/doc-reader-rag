@@ -356,7 +356,7 @@ function displayQueryResults(response) {
                         <button class="btn w-100 text-start text-white" type="button" 
                                 data-bs-toggle="collapse" data-bs-target="#source${index}">
                             <i class="fas fa-file-alt"></i> 
-                            Chunk ${index + 1} - ${doc.metadata.filename || 'Unknown'}
+                            Chunk ${doc.metadata.chunk_id || (index + 1)} - ${doc.metadata.filename || 'Unknown'}
                             ${score === null ? '' : `<span class="confidence-score float-end">Score: ${score.toFixed(4)}</span>`}
                         </button>
                     </h6>

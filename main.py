@@ -65,7 +65,7 @@ Examples:
         # Check if setup is needed
         if not Path(".env").exists() or not Path("venv").exists():
             print("First time setup required...")
-            run_setup()
+            # run_setup()
 
         # Start Django with setup
         start_django(args.host, args.port, with_setup=True)

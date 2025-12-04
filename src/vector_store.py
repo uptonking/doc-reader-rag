@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from langchain_openai import OpenAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -73,7 +74,8 @@ class FAISSVectorStore(VectorStoreManager):
 
         if use_local or not settings.openai_api_key:
             logger.info("Using local embeddings (sentence-transformers)")
-            self.embeddings = LocalEmbeddings("all-MiniLM-L6-v2")
+            # self.embeddings = LocalEmbeddings("all-MiniLM-L6-v2")
+            self.embeddings = LocalEmbeddings("mixedbread-ai/mxbai-embed-large-v1")
         else:
             logger.info("Using OpenAI embeddings")
             # Note: OpenAIEmbeddings will use OPENAI_API_KEY environment variable
@@ -180,8 +182,13 @@ class ChromaVectorStore(VectorStoreManager):
             from langchain_community.vectorstores import Chroma
 
             # Note: OpenAIEmbeddings will use OPENAI_API_KEY environment variable
-            self.embeddings = OpenAIEmbeddings(
-                model=settings.embedding_model
+            # self.embeddings = OpenAIEmbeddings(
+            #     model=settings.embedding_model
+            # )
+            self.embeddings = OllamaEmbeddings(
+                model=settings.embedding_model,
+                base_url="http://localhost:11434",
+                # api_key="local"
             )
             self.vector_store: Optional[Chroma] = None
             self.collection_name = "document_collection"

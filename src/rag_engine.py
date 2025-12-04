@@ -5,6 +5,7 @@ RAG (Retrieval-Augmented Generation) engine for document Q&A.
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 from loguru import logger
@@ -45,10 +46,18 @@ class RAGEngine:
             logger.info("Semantic coherence validation disabled")
 
         # Initialize LLM
-        self.llm = ChatOpenAI(
-            model=settings.chat_model,
+        # self.llm = ChatOpenAI(
+        #     model=settings.chat_model,
+        #     temperature=settings.temperature,
+        #     max_tokens=settings.max_tokens,
+        #     base_url="http://localhost:11434/v1",
+        #     api_key="local",
+        # )
+        llm = ChatOllama(
+            model=settings.chat_model,            # e.g. "llama3" or "llama3.1"
             temperature=settings.temperature,
-            max_tokens=settings.max_tokens
+            num_predict=settings.max_tokens,      # maps to max_tokens/prediction length
+            # base_url="http://localhost:11434",    # optional: override if Ollama runs elsewhere
         )
 
         # Create prompt template

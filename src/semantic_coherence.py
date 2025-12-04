@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from enum import Enum
 import numpy as np
 from langchain_openai import OpenAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_core.documents import Document
 from loguru import logger
 
@@ -81,8 +82,13 @@ class SemanticCoherenceValidator:
         fallback_config: Optional[Dict[str, Any]] = None
     ):
         '''Initialize the semantic coherence validator.'''
-        self.embeddings = OpenAIEmbeddings(
-            model=settings.embedding_model
+        # self.embeddings = OpenAIEmbeddings(
+        #     model=settings.embedding_model,
+        # )
+        self.embeddings = OllamaEmbeddings(
+            model=settings.embedding_model,
+            base_url="http://localhost:11434",
+            # api_key="local"
         )
 
         # Default coherence thresholds from config

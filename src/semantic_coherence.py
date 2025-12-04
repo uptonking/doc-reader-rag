@@ -85,9 +85,10 @@ class SemanticCoherenceValidator:
         # self.embeddings = OpenAIEmbeddings(
         #     model=settings.embedding_model,
         # )
+        import os
         self.embeddings = OllamaEmbeddings(
             model=settings.embedding_model,
-            base_url="http://localhost:11434",
+            base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
             # api_key="local"
         )
 

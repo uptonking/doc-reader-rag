@@ -53,7 +53,7 @@ class RAGEngine:
         #     base_url="http://localhost:11434/v1",
         #     api_key="local",
         # )
-        llm = ChatOllama(
+        self.llm = ChatOllama(
             model=settings.chat_model,            # e.g. "llama3" or "llama3.1"
             temperature=settings.temperature,
             num_predict=settings.max_tokens,      # maps to max_tokens/prediction length

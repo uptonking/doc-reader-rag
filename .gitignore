@@ -106,6 +106,7 @@ config.local.py
 *.index
 *.vectors
 chroma.sqlite3
+chroma.sqlite
 chroma_db/
 
 # API keys and secrets (additional)
